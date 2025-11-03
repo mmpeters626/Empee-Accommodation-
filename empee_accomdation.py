@@ -1,16 +1,38 @@
 import streamlit as st
 import os
+import base64
 
+# --- APP CONFIGURATION ---
 st.set_page_config(page_title='Empee Accommodation Web App', layout="wide")
 
 st.title('Welcome to Empee accommodation web app')
 
-# Sidebar
+# --- STANDARD WHATSAPP LINK (MALE_WHATSAPP_LINK_1) ---
+# Setting the required link globally: https://wa.me/2349117035219
+STANDARD_WHATSAPP_LINK = "https://wa.me/2349117035219"
+
+# --- HELPER FUNCTION FOR ROBUST VIDEO LOADING ---
+def play_local_video_bytes(filename):
+    """Reads a local video file and returns bytes for st.video."""
+    try:
+        with open(filename, "rb") as video_file:
+            video_bytes = video_file.read()
+            # Set autoplay=True and muted=True for the best chance of playing on mobile
+            st.video(video_bytes, format="video/mp4", autoplay=True, muted=True) 
+        return True
+    except FileNotFoundError:
+        return False
+    except Exception as e:
+        st.error(f"Error loading video {filename}: {e}")
+        return False
+# ----------------------------------------------------
+
+# --- SIDEBAR ---
 with st.sidebar:
     st.header("Empee Accommodation")
     st.write("Welcome!!!. 👋")
     st.markdown("---")
-    select_option = st.radio("Go to", ("Hostels", "Portfolio", "About", "Contact"))
+    select_option = st.radio("Go to", ("Male Private Hostels", "Female Private Hostel", "Apartments", "About", "Contact"))
     st.markdown("---")
     st.subheader("Settings")
     st.write("Pick a theme color:")
@@ -19,255 +41,554 @@ with st.sidebar:
     st.markdown(f"<h1 style='color:{selected_color};'>My Title</h1>", unsafe_allow_html=True)
     st.markdown("---")
     st.subheader("📫 Contact Me")
-    st.markdown("Feel free to reach out via [mmpeters626@gmail.com](mailto:mmpeters626@gmail.com) or connect on [https://www.linkedin.com/in/petersmicheal/](https://www.linkedin.com/)")
+    # Sidebar contact link is standardized
+    st.markdown(f"Feel free to reach out via [mmpeters626@gmail.com](mailto:mmpeters626@gmail.com) or chat on **WhatsApp**:")
+    st.link_button(label="Chat on WhatsApp 💬", url=STANDARD_WHATSAPP_LINK)
 
-if select_option == "Hostels":
+# --- GLOBAL IMAGE HELPER FUNCTION ---
+def get_base64_image(image_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode("utf-8")
+    except FileNotFoundError:
+        return None
+
+# --- MAIN CONTENT BODY ---
+
+if select_option == "Male Private Hostels":
     st.markdown(
         """
         ## These are the hostels for both male and female available for booking with their prices.
         NOTE: the ones taken are marked as taken
         """
     )
-
     st.write("Male Hostels")
-
-    # Display profile image
-    def get_base64_image(image_path):
-        try:
-            with open(image_path, "rb") as img_file:
-                return base64.b64encode(img_file.read()).decode("utf-8")
-        except FileNotFoundError:
-            st.error(f"Error: The image file '{image_path}' was not found. Please make sure it's in the same directory.")
-            return None
-
+    st.markdown("---")
+    
+    # --- PROFILE IMAGE ---
     profile_image_base64 = get_base64_image("My Profile Pics.jpg")
     if profile_image_base64:
+        st.markdown("""
+            <style>
+            .profile-img {
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-bottom: 20px;
+            }
+            </style>
+        """, unsafe_allow_html=True)
         st.markdown(f'<img src="data:image/png;base64,{profile_image_base64}" class="profile-img">', unsafe_allow_html=True)
+    else:
+        st.error(f"Error: Profile image 'My Profile Pics.jpg' not found.")
+    
+    
+    # --- MALE HOSTEL VIDEOS SECTION ---
+    st.subheader("Male Hostel Videos")
 
-    st.markdown("---")
+    # Define links using the standard link
+    MALE_WHATSAPP_LINK_1 = STANDARD_WHATSAPP_LINK
 
- 
-
-
-    # Function to load and encode image to base64
-    def get_base64_image(image_path):
-        try:
-            with open(image_path, "rb") as img_file:
-                return base64.b64encode(img_file.read()).decode("utf-8")
-        except FileNotFoundError:
-            st.error(f"Error: The image file '{image_path}' was not found. Please ensure it is in the correct directory.")
-            return None
-
-    # Display profile image
-    profile_image_base64 = get_base64_image("My Profile Pics.jpg")
-    if profile_image_base64:
-        st.markdown(f'<img src="data:image/png;base64,{profile_image_base64}" class="profile-img">', unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # List of videos with descriptions
+    # List of videos with descriptions (All 'whatsapp_link' fields are now STANDARD_WHATSAPP_LINK)
     videos_with_comments = [
         {
-            "filename": "This hostel is.mp4",
-            "description": "This is an overview of the hostel facilities."
-        },
-        {
             "filename": "male hostel video 1.mp4",
-            "description": "Tour of the male hostel rooms."
+            "description": "**8 man room male private hostel**\n"
+            "**Location:** moore road, off university road, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 530k total package per bed space for the 1st year and 450 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Close Proximity to both Unilag and Yabatech etc\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
         },
+        
+        {
+            "filename": "male hostel video 2.mp4",
+            "description": "**4 man room male private hostel** available\n"
+            "**Location:** Pako, Akoka, Lagos, very close to yabatech/unilag\n"
+            "**Price:** 730k total package per bed space for a year and 650k in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- Tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 10 minute walk to Unilag back gate\n"
+            "- Working Air conditioner\n"
+            "- Serene Environment\n"
+            "- Inverter\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
+        },
+        
         {
             "filename": "male hostel video 3.mp4",
-            "description": "Common areas in the hostel."
+            "description": "**6 man room male private hostel** available\n"
+            "**Location:** Pako, Akoka, Lagos, very close to yabatech/unilag\n"
+            "**Price:** 680k total package per bed space for a year and 600k in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- Tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 10 minute walk to Unilag back gate\n"
+            "- Working Air conditioner\n"
+            "- Serene Environment\n"
+            "- Inverter\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
         },
+        
         {
             "filename": "male hostel video 4.mp4",
-            "description": "Hostel dining area."
+            "description": "**2 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 780k total package per bed space for the 1st year and 700 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- Tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 10 minute walk to Unilag back gate\n"
+            "- Working Air conditioner\n"
+            "- Serene Environment\n"
+            "- Inverter\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
         },
+        
         {
             "filename": "male hostel video 5.mp4",
-            "description": "View of the hostel's recreational facilities."
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 730k total package per bed space for the 1st year and 650 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- Tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 10 minute walk to Unilag back gate\n"
+            "- Working Air conditioner\n"
+            "- Serene Environment\n"
+            "- Inverter\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
         },
+        
         {
-            "filename": "male hostel video 6.mp4",
-            "description": "Hostel security and safety features."
+            "filename": "male hostel video 5.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 730k total package per bed space for the 1st year and 650 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- Tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 10 minute walk to Unilag back gate\n"
+            "- Working Air conditioner\n"
+            "- Serene Environment\n"
+            "- Inverter\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
         },
-        {
-            "filename": "male hostel video 7.mp4",
-            "description": "Student testimonials and reviews."
+        
+        { 
+            "filename": "male hostel video 5.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 730k total package per bed space for the 1st year and 650 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- Tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 10 minute walk to Unilag back gate\n"
+            "- Working Air conditioner\n"
+            "- Serene Environment\n"
+            "- Inverter\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
         },
+        
         {
             "filename": "male hostel video 8.mp4",
-            "description": "Night view of the hostel premises."
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Iwaya, akoka, Yaba, lagos, unilag\n"
+            "**Price:** 600k total package per bed space for the 1st year and 500k in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Working Air conditioner\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 1 minute walk to unilag back gate\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
         },
+        
         {
             "filename": "male hostel video 9.mp4",
-            "description": "Hostel entrance and reception area."
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1
+        },
+        
+        {
+            "filename": "male hostel video 10.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
         },
         {
-            "filename": "male hostel video2.mp4",
-            "description": "Additional view of hostel facilities."
-        }
+            "filename": "male hostel video 11.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
+        },
+        
+        {
+            "filename": "male hostel video 12.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
+        },
+        
+        {
+            "filename": "male hostel video 13.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
+        },
+        
+        {
+            "filename": "male hostel video 14.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
+        },
+        
+        {
+            "filename": "male hostel video 15.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
+        },
+        
+        {
+            "filename": "male hostel video 16.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
+        },
+        
+        {
+            "filename": "male hostel video 17.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": MALE_WHATSAPP_LINK_1 # Updated
+        },
+        
+        # NOTE: Videos 18-23 did not have a link in the original code, so no button is added.
+        {
+            "filename": "male hostel video 18.mp4",
+            "description": "Additional view of hostel facilities.",
+            "whatsapp_link": None 
+        },
+        
+        {
+            "filename": "male hostel video 19.mp4",
+            "description": "Additional view of hostel facilities.",
+            "whatsapp_link": None
+        },
+        {
+            "filename": "male hostel video 20.mp4",
+            "description": "Additional view of hostel facilities.",
+            "whatsapp_link": None
+        },
+        {
+            "filename": "male hostel video 21.mp4",
+            "description": "Additional view of hostel facilities.",
+            "whatsapp_link": None
+        },
+        {
+            "filename": "male hostel video 22.mp4",
+            "description": "Additional view of hostel facilities.",
+            "whatsapp_link": None
+        },
+        {
+            "filename": "male hostel video 23.mp4",
+            "description": "Additional view of hostel facilities.",
+            "whatsapp_link": None
+        },
     ]
 
     # Loop through each video and display with comment
-    for video_info in videos_with_comments:
+    col1, col2 = st.columns(2) 
+    
+    # We will use a counter to alternate between the two columns
+    for i, video_info in enumerate(videos_with_comments):
         filename = video_info["filename"]
         description = video_info["description"]
+        whatsapp_link = video_info["whatsapp_link"]
+        
+        # Select the column based on the index (even/odd)
+        current_col = col1 if i % 2 == 0 else col2
+        
+        with current_col:
+            st.subheader(f"Video {i+1}")
+            
+            # *** USING NEW HELPER FUNCTION HERE ***
+            video_loaded = play_local_video_bytes(filename)
+            
+            if video_loaded:
+                st.markdown(f"**Description:** {description}")
+                
+                # --- ADDED THE LINK BUTTON HERE ---
+                if whatsapp_link:
+                    st.link_button(label="Book via WhatsApp Now! 📱", url=whatsapp_link, help="Click to chat and reserve your space")
+                # -----------------------------------
+                
+                st.markdown("---") # Add a separator in the column
+            else:
+                st.error(f"Video file '{filename}' not found or failed to load.")
+
+elif select_option == "Female Private Hostel":
+    st.title("Female Private Hostels")
+    st.markdown("### Images and videos of Female Private Hostels available for booking.")
+    st.markdown("---")
+        
+    # --- FEMALE HOSTEL IMAGES SECTION ---
+    st.subheader("Female Hostel Images")
+        
+    # The WhatsApp link is now standardized
+    FEMALE_WHATSAPP_LINK = STANDARD_WHATSAPP_LINK # Updated
+
+    image_with_comments = [
+        
+        {
+            "filename": "female hostel picture 2 room.jpg",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": FEMALE_WHATSAPP_LINK # Updated
+        },
+        
+        
+        {
+            "filename": "female hostel picture 2 kitchen.jpg",
+            "description": "Tour of the male hostel rooms.",
+            "whatsapp_link": None
+        },
+        {
+            "filename": "female hostel picture 1.jpg",
+            "description": "Common areas in the hostel.",
+            "whatsapp_link": None
+        },
+        {
+            "filename": "female hostel picture 1.jpg",
+            "description": "Hostel dining area.",
+            "whatsapp_link": None
+        }
+    ]
+
+    # Display images
+    for image_info in image_with_comments:
+        filename = image_info["filename"]
+        description = image_info["description"]
+        whatsapp_link = image_info["whatsapp_link"]
         if os.path.exists(filename):
-            st.video(filename, width=600)
-            # Display the comment or description below the video
+            st.image(filename, width=350)
             st.markdown(f"**Description:** {description}")
+            
+            # --- ADDED THE LINK BUTTON HERE (for image section) ---
+            if whatsapp_link:
+                st.link_button(label="Book via WhatsApp Now! 📱", url=whatsapp_link, help="Click to chat and reserve your space")
+            # --------------------------------------------------------
+            
             st.markdown("---")
         else:
-            st.error(f"Video file '{filename}' not found.")
+            st.error(f"Image file '{filename}' not found for female hostels.")
+            
+    st.subheader("Female Hostel Videos")
 
-    # Resume section
-    st.title("My Resume")
-    st.markdown("### MICHEAL PETERS")
-    st.markdown(
-        """
-        - Address: 3, Lalubu Street, Okeilewo, Abeokuta, Ogun State, Abeokuta North, Ogun State
-        - Phone: 08146399129
-        - Email: mmpeters626@gmail.com
-        - LinkedIn: https://www.linkedin.com/in/petersmicheal/
-        """
-    )
-    st.markdown("---")
-    st.markdown("### OBJECTIVE")
-    st.markdown(
-        """
-        Enthusiastic and detail-oriented aspiring Data Scientist with a strong foundation 
-        in statistical analysis, machine learning, and data visualization. Eager to apply 
-        academic knowledge and technical skills to real-world projects through an internship, 
-        aiming to contribute to data-driven decision-making and gain practical industry experience.
-        """
-    )
-    st.markdown("---")
-    st.markdown("### SKILLS")
-    st.markdown(
-        """
-        - Programming: Python (Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn)
-        - Data Analysis & Visualization
-        - Machine Learning Algorithms: Linear Regression, Logistic Regression, Decision Trees, Random Forest
-        - SQL & Databases
-        - Basic Knowledge of Big Data Tools (Spark, Hadoop)
-        - Statistical Analysis & Hypothesis Testing
-        """
-    )
-    st.markdown("---")
-    st.markdown("### EDUCATION")
-    st.markdown(
-        """
-        **Bachelor of Science in Education (BSc.Ed) in Technology Education (in view)**
-        University of Yaba, Lagos
-        *Expected Graduation: August 2026*
-        *Relevant Coursework: Data Structures, Statistics, Machine Learning, Data Visualization, Databases*
-        """
-    )
-    st.markdown("---")
-    st.markdown("### PROJECTS")
-    st.markdown(
-        """
-        **Customer Churn Prediction**
-        - Developed a classification model to predict customer churn using Python and Scikit-learn, achieving 85% accuracy.
-        - Performed data cleaning, feature engineering, and model evaluation.
+    # List of videos with descriptions (Using a placeholder list structure for brevity)
+    videos_with_comments_female = [
+        
+        {
+            "filename": "male hostel video 1.mp4",
+            "description": "**8 man room male private hostel**\n"
+            "**Location:** moore road, off university road, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 530k total package per bed space for the 1st year and 450 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Close Proximity to both Unilag and Yabatech etc\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": FEMALE_WHATSAPP_LINK # Updated
+        },
+        
+        {
+            "filename": "male hostel video 2.mp4",
+            "description": "**4 man room male private hostel** available\n"
+            "**Location:** Pako, Akoka, Lagos, very close to yabatech/unilag\n"
+            "**Price:** 730k total package per bed space for a year and 650k in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Constant water supply\n"
+            "- Tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- 10 minute walk to Unilag back gate\n"
+            "- Working Air conditioner\n"
+            "- Serene Environment\n"
+            "- Inverter\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": FEMALE_WHATSAPP_LINK # Updated
+        },
+        # NOTE: Including the last video for completeness, assuming all others in the original list are also updated
+        {
+            "filename": "male hostel video 17.mp4",
+            "description": "**4 man room female private hostel** available\n"
+            "**Location:** Pako, akoka, Yaba, lagos, very close to yabatech/unilag\n"
+            "**Price:** 480k total package per bed space for the 1st year and 400 in subsequent years....\n\n"
+            "#### **Hostel Facilities**\n\n"
+            "- 24/7 Electricity Power Supply\n"
+            "- Each bunks has a fan\n"
+            "- Constant water supply\n"
+            "- tiolets and Baths\n"
+            "- Tight security etc\n"
+            "- Hotplate is available\n\n"
+            "Send a direct message to Michael Peters to reserve your bed space in this hostel.",
+            "whatsapp_link": FEMALE_WHATSAPP_LINK # Updated
+        },
+    ]
+    
+    # Display videos (using the same structure as the male section for button placement)
+    for video_info in videos_with_comments_female:
+        filename = video_info["filename"]
+        description = video_info["description"]
+        whatsapp_link = video_info["whatsapp_link"]
+        
+        # *** USING NEW HELPER FUNCTION HERE ***
+        video_loaded = play_local_video_bytes(filename)
+        
+        if video_loaded:
+            st.markdown(f"**Description:** {description}")
+            
+            # --- ADDED THE LINK BUTTON HERE (for video section) ---
+            if whatsapp_link:
+                st.link_button(label="Book via WhatsApp Now! 📱", url=whatsapp_link, help="Click to chat and reserve your space")
+            # --------------------------------------------------------
+            
+            st.markdown("---")
+        else:
+            st.error(f"Video file '{filename}' not found or failed to load.")
 
-        **Employee Salary Prediction**
-
-        **Sentiment Analysis of Social Media Data**
-        - Analyzed Twitter data to classify sentiment using NLP techniques and Python libraries.
-        - Visualized sentiment trends over time.
-
-        **Sales Data Visualization Dashboard**
-        - Created an interactive sales performance dashboard in Tableau to explore regional sales metrics.
-        """
-    )
-    st.markdown("---")
-    st.markdown("### CERTIFICATIONS AND COURSES")
-    st.markdown(
-        """
-        - Introduction to Data Science in Python – Coursera, University of Michigan
-        - Machine Learning – Coursera, Stanford University
-        - Data Analysis with Python – freeCodeCamp
-        """
-    )
-    st.markdown("---")
-    st.markdown("### EXTRACURRICULAR ACTIVITIES")
-    st.markdown(
-        """
-        - Member of [University Data Science Club]
-        - Participated in Kaggle competitions (if applicable)
-        - Volunteered for data analysis projects at [Organization Name]
-        """
-    )
-    st.markdown("---")
-    st.markdown("### LANGUAGES")
-    st.markdown("- English (Fluent)")
-    st.markdown("---")
-
-elif select_option == "Portfolio":
-    st.title("My Portfolio")
-    st.markdown(
-        """
-        Welcome to my portfolio! Here you will find some of my key projects and work. 
-        Each project showcases my skills in data science, machine learning, and data visualization.
-        """
-    )
-
-    st.subheader("Project Showcase")
-    st.markdown("#### Customer Churn Prediction App")
-    st.write("- Developed a classification model to predict customer churn using Python and Scikit-learn, achieving 85% accuracy \n"
-             "- Performed data cleaning, feature engineering, and model evaluation.")
-    st.markdown("---")
-    st.markdown("#### Car Prices Prediction App")
-    st.write("- Developed a Regression model to predict car prices using Python and Scikit-learn, achieving 81% accuracy \n"
-             "- Performed data cleaning, feature engineering, and model evaluation.")
-    st.markdown("---")
-    st.markdown("#### Student performance Prediction")
-    st.write("- Developed a classification model to predict students performances using Python and Scikit-learn, achieving 85% accuracy \n"
-             "- Performed data cleaning, feature engineering, and model evaluation.")
-    st.markdown("---")
-    st.markdown("#### Diabetes Prediction")
-    st.write("- Developed a classification model to predict the tendency of an individual to have diabetes due to some informations \n"
-             "supplied by the individual as requested using Python and Scikit-learn, achieving 85% accuracy \n"
-             "- Performed data cleaning, feature engineering, and model evaluation.")
-    st.markdown("---")
-    st.markdown("#### Weather App")
-    st.write("- Built a Python application using Streamlit to provide real-time weather information for any location worldwide, here is the link to check out the app\n"
-             "[https://whether-app-mop.streamlit.app](https://whether-app-mop.streamlit.app)")
-    st.markdown("---")
+elif select_option == "Apartments":
+    st.title("Apartments")
+    st.markdown("Content for Apartments will go here.")
 
 elif select_option == "About":
-    st.title("About Me")
-    st.markdown("### Hello!!, This a brief overview about me")
-    st.markdown(
-        """
-        I am a passionate and driven aspiring data scientist with a knack for solving problems
-        and uncovering insights from data. I am currently pursuing my Bachelor of Science in 
-        Education (BSc.Ed) in Technology Education at the University of Yaba, Lagos. 
-        My goal is to leverage my skills in data science and machine learning to contribute
-        to meaningful, data-driven solutions.
-        """
-    )
-    st.markdown("---")
-   
-    st.markdown("- Studying")
-    st.markdown("- Making Researches")
-    st.markdown("- Praying")
+    st.title("About Empee Accommodation")
+    st.markdown("Content about the company/service will go here.")
 
 elif select_option == "Contact":
-    st.title("Contact")
-    st.markdown("feel free to connect with me via.")
-    st.markdown(
-        """
-        - **Email:** mmpeters626@gmail.com
-        - **Phone:** 08146399129 0r 08112398005
-        - **LinkedIn:** https://www.linkedin.com/in/petersmicheal/
-        """
-    )
-    st.markdown("---")
-    st.markdown(r"""
-                **_Built Using Python and Streamlit_**
-                """)
-    st.markdown("### _Micheal Peters_")
-    st.markdown("---")
+    st.title("Contact Us")
+    st.markdown(f"For bookings and inquiries, please reach out via WhatsApp using this link:")
+    st.link_button(label="Chat on WhatsApp 💬", url=STANDARD_WHATSAPP_LINK)
